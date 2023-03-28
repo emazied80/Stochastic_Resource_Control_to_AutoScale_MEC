@@ -7,8 +7,8 @@ This project introduces a stochastic resource control optimization model to allo
 
 --> jre > 1.5 for java compiler
 
---> IBM ILOG CPLEX (Educational License) ... You can obtain educational license from 
-                                           https://www.ibm.com/academic/topic/data-science?ach_id=6fe17098-43df-4a9d-8412-3377286841a3
+--> IBM ILOG CPLEX (Educational License) ... 
+>> You can obtain educational license from  https://www.ibm.com/academic/topic/data-science?ach_id=6fe17098-43df-4a9d-8412-3377286841a3
 
 
 CPLEX was installed on x86 64-bit Ubuntu 20.04.4 LTS. Version for Windows and Mac machines are also available on IBM website.
