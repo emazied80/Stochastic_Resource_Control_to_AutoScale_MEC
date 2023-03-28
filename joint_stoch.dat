@@ -1,0 +1,159 @@
+/*********************************************
+ * OPL 22.1.0.0 Data
+ * Author: emazied
+ * Creation Date: Dec 5, 2022 at 7:46:27 PM
+ *********************************************/
+//// The numerical value of the predefined Scalar Data parameters that are declared in the .mod file 
+P = 64; //64 CPU cores, we assume the availability of 8 of AMD EPYC 7251 8-Core Processor ... it has two sockets for memory access
+
+G = 640;  // One Tesla V100 GPU that includes 640 tensor cores for matrix multiplication, 
+
+a_p = 2048; // Bytes  
+
+a_g = 4096; // Bytes  
+
+// Memory pages ... 
+/* although the maximum number of pages that could be accessed at the same time is 32, 
+   we considered the whole number of available pages by dividing memory size 3GbiB over page size ... 
+*/				
+M_p = 3000;   // 8388608; 
+
+M_g = 10000;   //8388608; 
+
+I = 3;  // {enumerate > 1: eMBB service, 2: urllc service, 3: mMTC service} 
+
+z = 4;  // 4 Bytes ... data size of integer data type
+	
+pi_p =  5954000000; //744250000; // Operations/second per core (Integer operations math per second) (47632000000/8) source https://www.cpubenchmark.net/cpu.php?cpu=AMD+EPYC+7251&id=3196
+
+pi_g = 175000000000; // Operations/second 14 Tera FLOPs for single point operations but I conisdered the 112 Tera Flops for tensor (matrix multiplication operations)
+                     // 112 Tera / 640 cores   
+                     // ... https://images.nvidia.com/content/technologies/volta/pdf/tesla-volta-v100-datasheet-letter-fnl-web.pdf and https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/tesla-product-literature/v100-application-performance-guide.pdf 
+
+beta_p = 153600000000; //; // Bytes/second ... It is 153.6 GB/s per socket bandwidth according to AMD EPYC 7251 8-Core Processor full specs at https://www.amd.com/en/product/2006
+
+beta_g = 900000000000; //  Bytes/second it is 900 GB/s
+
+//alpha = 0.99; // This is a control parameter for our performance evaluation with probability ranges from 0.6 to 0.99 ... start with 0.99 with step 0.01 through 0.9 then step 0.1 through 0.6   
+
+
+/// 1.64497633573213 for alpha 0.99
+/// 0.90619382659973 for alpha 0.90
+/// 0.59511607684869 for alpha 0.80
+/// 0.37080711134710 for alpha 0.70
+/// 0.17914348672704 for alpha 0.60
+/// 0.00000002658664 for alpha 0.50
+
+erf_inv = 1.64497633573213 ;  // it is the value of the inverse error function (erf)^{-1} of (2 * alpha - 1) should be computed from tables
+
+ 
+////////////////////////////////////////////////////////////////////////
+
+/////////// vector of the parameters that reflect stochastic behavior of the model
+
+/*
+ 
+100, 200, 34, 68
+h = [100, 100, 100];
+n = [200, 200, 200];
+gamma = [34, 34, 34];
+rho = [68, 68, 68];
+
+200, 400, 68, 136
+h= [200, 200, 200];
+n = [400, 400, 400];
+gamma = [68, 68, 68];
+rho = [136, 136, 136];
+
+300, 600, 102, 204
+h = [300, 300, 300];
+
+n = [600, 600, 600];
+
+gamma = [102, 102, 102];
+ 
+rho = [204, 204, 204];
+
+400, 800, 136, 272
+h = [400, 400, 400];
+
+n = [800, 800, 800];
+
+gamma = [136, 136, 136];
+ 
+rho = [272, 272, 272];
+
+500, 1000, 170, 340
+h = [500, 500, 500];
+
+n = [1000, 1000, 1000];
+
+gamma = [170, 170, 170];
+ 
+rho = [340, 340, 340];
+
+*/
+
+h = [500, 500, 500];
+
+n = [1000, 1000, 1000];
+
+gamma = [170, 170, 170];
+ 
+rho = [340, 340, 340];
+
+delta = [0.0009, 0.0018, 0.00018]; //...; /// all values here in seconds
+
+avg_r =  [30, 30, 30]; //...;
+
+var_r = [10, 10, 10];    
+/*
+/// set of very large numbers 
+h = [1000, 1200, 1300]; 
+n = [2000, 2400, 2600];
+rho   = [500, 600, 700];
+gamma = [800, 900, 1000];
+
+
+/// set of large sizes 
+h = [200, 600, 210]; 
+n = [400, 400, 4100];
+rho   = [90, 100, 80];
+gamma = [100, 90, 200];
+*/
+
+/*
+/// set of intermediate numbers 
+h = [90, 80, 90]; 
+n = [100, 90, 80];
+rho   = [40, 50, 30];
+gamma = [20, 15, 20];
+*/
+
+///small numbers 
+/*
+h = [18, 15, 20]; 
+n = [40, 30, 50];
+rho   = [9, 10, 8];
+gamma = [15, 12, 30];
+*/
+
+/* 
+Computation of delta based on Reference computing in communication textbook that MEC processing time takes around 
+0.3 of total roundtrip delay and LDPC decoding time = 0.6 of total processing time of the radio protocol stack at the edge
+
+Thus, uper bound delay = 0.3*0.6*RTT... eMBB ranges from 5 to 50 msec (we choose 5 msec), mMTC ranges (10 to 50 msec), 
+we choose 10 msec, URRLC ranges from 0.5 to 50 msec (we choose 1 msec).
+*/   
+
+/*
+avg_r = [30, 20, 10];
+var_r = [6, 5, 7];
+*/
+
+/*
+/// small numbers 
+avg_r = [10, 5, 4];
+var_r = [3, 1, 2]; 
+*/
+///////////////////////////////////////////////////////////
